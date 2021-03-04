@@ -1,13 +1,13 @@
 package covid19.backend.Models;
 
-public class AuthResponse {
+public class UserSignInResponse {
     private String email;
     private String token;
 
-    public AuthResponse() {
+    public UserSignInResponse() {
     }
 
-    public AuthResponse(String email, String token) {
+    public UserSignInResponse(String email, String token) {
         this.email = email;
         this.token = token;
     }

@@ -4,19 +4,19 @@ import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-public class MyUserDetails implements UserDetails {
+public class AuthUserDetails implements UserDetails {
 
     /**
      *
      */
     private static final long serialVersionUID = 1L;
-    User retrievdUser;
+    UserSignUpRequest retrievdUserSignUpRequest;
 
-    public MyUserDetails(User retrievdUser) {
-        this.retrievdUser = retrievdUser;
+    public AuthUserDetails(UserSignUpRequest retrievdUserSignUpRequest) {
+        this.retrievdUserSignUpRequest = retrievdUserSignUpRequest;
     }
 
-    public MyUserDetails() {
+    public AuthUserDetails() {
     }
 
     @Override

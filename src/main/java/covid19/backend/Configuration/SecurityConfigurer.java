@@ -2,7 +2,6 @@ package covid19.backend.Configuration;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -11,10 +10,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import covid19.backend.Filter.JWTRequestFilter;
-import covid19.backend.Misc.CustomAuthProvider;
+import covid19.backend.Misc.DynamoDBAuthProvider;
 
 @EnableWebSecurity
 public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
@@ -22,7 +20,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
     JWTRequestFilter jwtRequestFilter;
 
     @Autowired
-    CustomAuthProvider authProvider;
+    DynamoDBAuthProvider authProvider;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) {

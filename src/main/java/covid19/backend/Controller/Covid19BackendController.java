@@ -1,5 +1,6 @@
 package covid19.backend.Controller;
 
+import covid19.backend.Models.UserSignUpRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -10,24 +11,23 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import covid19.backend.Models.AuthResponse;
-import covid19.backend.Models.SignUpResponse;
-import covid19.backend.Models.User;
-import covid19.backend.Repository.UserRepository;
-import covid19.backend.Services.MyUserDetailsService;
+import covid19.backend.Models.UserSignInResponse;
+import covid19.backend.Models.UserSignUpResponse;
+import covid19.backend.Repository.UserAuthRepository;
+import covid19.backend.Services.UserAuthService;
 import covid19.backend.Utils.JWTUtil;
 
 @RestController
-public class BackendResource {
+public class Covid19BackendController {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserAuthRepository userAuthRepository;
 
     @Autowired
     AuthenticationManager authManager;
 
     @Autowired
-    MyUserDetailsService uDetailsService;
+    UserAuthService uDetailsService;
 
     @Autowired
     JWTUtil jwtTokenUtil;
@@ -38,21 +38,21 @@ public class BackendResource {
     }
 
     @PostMapping("/auth/register")
-    public SignUpResponse register(@RequestBody User user) {
-        return userRepository.register(user);
+    public UserSignUpResponse register(@RequestBody UserSignUpRequest userSignUpRequest) {
+        return userAuthRepository.register(userSignUpRequest);
     }
 
     @PostMapping("/auth/login")
-    public ResponseEntity<?> login(@RequestBody User user) throws Exception {
+    public ResponseEntity<?> login(@RequestBody UserSignUpRequest userSignUpRequest) throws Exception {
         try {
-            authManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
+            authManager.authenticate(new UsernamePasswordAuthenticationToken(userSignUpRequest.getEmail(), userSignUpRequest.getPassword()));
         } catch (BadCredentialsException e) {
             throw new Exception("Incorrect Username or password");
         }
 
-        final UserDetails userDetails = this.uDetailsService.loadUserByUsername(user.getEmail());
+        final UserDetails userDetails = this.uDetailsService.loadUserByUsername(userSignUpRequest.getEmail());
         final String jwt = jwtTokenUtil.generateToken(userDetails);
 
-        return ResponseEntity.ok(new AuthResponse(user.getEmail(), jwt));
+        return ResponseEntity.ok(new UserSignInResponse(userSignUpRequest.getEmail(), jwt));
     }
 }

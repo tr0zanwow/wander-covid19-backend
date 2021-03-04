@@ -6,26 +6,24 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import covid19.backend.Models.MyUserDetails;
-import covid19.backend.Models.User;
-import covid19.backend.Repository.UserRepository;
+import covid19.backend.Models.UserSignUpRequest;
+import covid19.backend.Repository.UserAuthRepository;
 
 import java.util.ArrayList;
 
 @Service
-public class MyUserDetailsService implements UserDetailsService {
+public class UserAuthService implements UserDetailsService {
 
     @Autowired
-    UserRepository userRepository;
+    UserAuthRepository userAuthRepository;
 
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-        User retrievdUser = userRepository.findByUserName(userName);
-        if (retrievdUser == null) {
+        UserSignUpRequest retrievedUserSignUpRequest = userAuthRepository.findByUserName(userName);
+        if (retrievedUserSignUpRequest == null) {
             throw new UsernameNotFoundException("No found user with email: " + userName);
         }
-
-        return new org.springframework.security.core.userdetails.User(retrievdUser.getEmail(),retrievdUser.getPassword(),new ArrayList<>());
+        return new org.springframework.security.core.userdetails.User(retrievedUserSignUpRequest.getEmail(), retrievedUserSignUpRequest.getPassword(),new ArrayList<>());
     }
 
 }

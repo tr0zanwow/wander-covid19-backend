@@ -1,14 +1,14 @@
 package covid19.backend.Models;
 
-public class SignUpResponse {
+public class UserSignUpResponse {
 
     private String uuid;
     private String email;
 
-    public SignUpResponse() {
+    public UserSignUpResponse() {
     }
 
-    public SignUpResponse(String uuid, String email) {
+    public UserSignUpResponse(String uuid, String email) {
         this.uuid = uuid;
         this.email = email;
     }
