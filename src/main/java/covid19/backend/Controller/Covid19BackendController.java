@@ -1,58 +1,62 @@
 package covid19.backend.Controller;
 
+import covid19.backend.Models.UserSignInRequest;
 import covid19.backend.Models.UserSignUpRequest;
+import covid19.backend.Services.CovidDataSyncService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
 import covid19.backend.Models.UserSignInResponse;
 import covid19.backend.Models.UserSignUpResponse;
-import covid19.backend.Repository.UserAuthRepository;
 import covid19.backend.Services.UserAuthService;
 import covid19.backend.Utils.JWTUtil;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.mail.MessagingException;
 
 @RestController
 public class Covid19BackendController {
-
     @Autowired
-    private UserAuthRepository userAuthRepository;
+    UserAuthService userAuthService;
 
     @Autowired
     AuthenticationManager authManager;
 
     @Autowired
-    UserAuthService uDetailsService;
+    CovidDataSyncService dataSyncService;
 
     @Autowired
     JWTUtil jwtTokenUtil;
 
-    @GetMapping("/home")
+    @GetMapping("/")
     public String home() {
         return "Website Dashboard";
     }
 
-    @PostMapping("/auth/register")
-    public UserSignUpResponse register(@RequestBody UserSignUpRequest userSignUpRequest) {
-        return userAuthRepository.register(userSignUpRequest);
+    @GetMapping("/verifyaccount")
+    public ModelAndView verifyaccount(@RequestParam(value = "token", defaultValue = "", required = true) String token) {
+        return userAuthService.verifyUserToken(token);
     }
 
-    @PostMapping("/auth/login")
-    public ResponseEntity<?> login(@RequestBody UserSignUpRequest userSignUpRequest) throws Exception {
-        try {
-            authManager.authenticate(new UsernamePasswordAuthenticationToken(userSignUpRequest.getEmail(), userSignUpRequest.getPassword()));
-        } catch (BadCredentialsException e) {
-            throw new Exception("Incorrect Username or password");
-        }
+    @GetMapping("/getdata")
+    public void getCovidData() throws Exception {
+        dataSyncService.getDataNation();
+    }
 
-        final UserDetails userDetails = this.uDetailsService.loadUserByUsername(userSignUpRequest.getEmail());
+    @PostMapping("/signup")
+    public UserSignUpResponse register(@RequestBody UserSignUpRequest userSignUpRequest) throws MessagingException {
+        return userAuthService.registerUser(userSignUpRequest);
+    }
+
+    @PostMapping("/signin")
+    public ResponseEntity<?> login(@RequestBody UserSignInRequest userSignInRequest) {
+        authManager.authenticate(new UsernamePasswordAuthenticationToken(userSignInRequest.getemail(), userSignInRequest.getPassword()));
+        final UserDetails userDetails = userAuthService.loadUserByUsername(userSignInRequest.getemail());
         final String jwt = jwtTokenUtil.generateToken(userDetails);
 
-        return ResponseEntity.ok(new UserSignInResponse(userSignUpRequest.getEmail(), jwt));
+        return ResponseEntity.ok(new UserSignInResponse(userSignInRequest.getemail(), jwt));
     }
 }
