@@ -1,4 +1,4 @@
-package covid19.backend.Models.Covid19;
+package covid19.backend.Models;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
