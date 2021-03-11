@@ -2,20 +2,20 @@ package covid19.backend.Misc;
 
 import java.util.ArrayList;
 
-import covid19.backend.Models.UserSignUpRequest;
+import covid19.backend.Models.UserSignInRequest;
+import covid19.backend.Services.UserAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
-import covid19.backend.Repository.UserAuthRepository;
 
 @Component
-public class DynamoDBAuthProvider implements AuthenticationProvider {
+public class MongoDBAuthProvider implements AuthenticationProvider {
 
     @Autowired
-    UserAuthRepository userAuthRepository;
+    UserAuthService userAuthService;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -23,7 +23,7 @@ public class DynamoDBAuthProvider implements AuthenticationProvider {
         String username = authentication.getName();
         String password = authentication.getCredentials().toString();
 
-        if (Boolean.TRUE.equals(userAuthRepository.login(new UserSignUpRequest(username, password)))) {
+        if (Boolean.TRUE.equals(userAuthService.login(new UserSignInRequest(username, password)))) {
 
             return new UsernamePasswordAuthenticationToken(username, password, new ArrayList<>());
         } else {
