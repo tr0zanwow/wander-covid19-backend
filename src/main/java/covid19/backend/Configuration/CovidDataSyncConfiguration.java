@@ -17,7 +17,7 @@ public class CovidDataSyncConfiguration {
 
     @Scheduled(cron = "0 0 21 * * *", zone = "GMT+5:30")
     public void syncLatestData() throws Exception {
-//
+        dataSyncService.getNewsData();
     }
 
     public void syncCoordinates() throws IOException {
