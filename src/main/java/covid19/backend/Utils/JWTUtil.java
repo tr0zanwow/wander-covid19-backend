@@ -13,7 +13,7 @@ import java.util.function.Function;
 @Service
 public class JWTUtil {
 
-    private String SECRET_KEY = "WJJNu*db!Vn#r^!8t1tGZkrhdzA5q0Nhy*$gAmuzMDp7%p$YmcNfhlqWg5dSs2l03hXb";
+    private final String SECRET_KEY = "WJJNu*db!Vn#r^!8t1tGZkrhdzA5q0Nhy*$gAmuzMDp7%p$YmcNfhlqWg5dSs2l03hXb";
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
