@@ -7,6 +7,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 @Configuration
 @EnableScheduling
@@ -29,5 +30,10 @@ public class CovidDataSyncConfiguration {
         dataSyncService.getDataStateWise();
         dataSyncService.getDataNation();
         dataSyncService.getDataDistrictWise();
+    }
+
+    public void syncNewsData() throws ParseException {
+        dataSyncService.getNewsData();
+        dataSyncService.getVideoNewsData();
     }
 }
