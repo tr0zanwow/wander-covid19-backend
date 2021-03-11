@@ -12,7 +12,7 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import covid19.backend.Filter.JWTRequestFilter;
-import covid19.backend.Misc.DynamoDBAuthProvider;
+import covid19.backend.Misc.MongoDBAuthProvider;
 
 @EnableWebSecurity
 public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
@@ -20,7 +20,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
     JWTRequestFilter jwtRequestFilter;
 
     @Autowired
-    DynamoDBAuthProvider authProvider;
+    MongoDBAuthProvider authProvider;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) {
@@ -35,13 +35,12 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests().antMatchers("/auth/login", "/auth/register").permitAll().anyRequest().authenticated()
+        http.authorizeRequests().antMatchers("/signup", "/signin", "/verifyaccount","/getdata","/synccoordinates","/syncdata").permitAll().anyRequest().authenticated()
                 .and().formLogin().permitAll()
                 .and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-
         http.csrf().disable();
     }
 
