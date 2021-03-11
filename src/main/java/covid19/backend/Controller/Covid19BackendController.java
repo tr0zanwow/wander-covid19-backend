@@ -1,13 +1,10 @@
 package covid19.backend.Controller;
 
-import com.google.gson.Gson;
 import covid19.backend.Configuration.CovidDataSyncConfiguration;
 import covid19.backend.Models.*;
-import covid19.backend.Repository.GeoCoding;
 import covid19.backend.Services.CovidDataSyncService;
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.geo.GeoJson;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,10 +14,8 @@ import covid19.backend.Utils.JWTUtil;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.ModelAndView;
-
 import javax.mail.MessagingException;
 import java.io.IOException;
-import java.util.Map;
 
 @RestController
 public class Covid19BackendController {
@@ -61,7 +56,7 @@ public class Covid19BackendController {
 
     @GetMapping("/syncdata")
     public void syncData() throws Exception {
-        covidDataSyncConfiguration.syncCovidData();
+        covidDataSyncConfiguration.syncLatestData();
     }
 
     @PostMapping("/signup")
