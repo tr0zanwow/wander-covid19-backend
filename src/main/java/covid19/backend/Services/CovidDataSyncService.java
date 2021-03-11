@@ -3,20 +3,22 @@ package covid19.backend.Services;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 import covid19.backend.Models.Coordinates;
-import covid19.backend.Models.Covid19.CsvBeanDistrictWise;
-import covid19.backend.Models.Covid19.CsvBeanNationSeries;
-import covid19.backend.Models.Covid19.CsvBeanStateSeries;
-import covid19.backend.Models.Covid19.CsvBeanStateWise;
+import covid19.backend.Models.Covid19.*;
 import covid19.backend.Models.GeoCodeCoordinates;
 import covid19.backend.Models.MongoDB.*;
 import covid19.backend.Repository.Covid19.*;
 import covid19.backend.Repository.GeoCoding;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -40,7 +42,13 @@ public class CovidDataSyncService {
     StateSeriesMongoRepository stateSeriesMongoRepository;
 
     @Autowired
+    NewsAPIMongoRepository newsAPIMongoRepository;
+
+    @Autowired
     GeoCoding geoCoding;
+
+    @Autowired
+    RestTemplate restTemplate;
 
     private static final String STATE_WISE_URL = "https://api.covid19india.org/csv/latest/state_wise.csv";
     private static final String STATE_SERIES_URL = "https://api.covid19india.org/csv/latest/state_wise_daily.csv";
@@ -157,7 +165,27 @@ public class CovidDataSyncService {
         }
     }
 
-    public void getNewsData() {
+    public void getNewsData() throws ParseException {
+        newsAPIMongoRepository.deleteAll();
+        List<MongoCasesStateWise> casesStateWises = stateWiseMongoRepository.findAll();
+        for (MongoCasesStateWise csw : casesStateWises.subList(1, casesStateWises.size() - 1)) {
+            NewsAPI newsAPI = restTemplate.getForObject("http://newsapi.org/v2/everything?q=covid19 "+csw.getState()+"&from=2021-03-01&sortBy=publishedAt&apiKey=898b8147285c4367a43df902a0196149", NewsAPI.class);
 
+            List<NewsAPI.Article> articles = newsAPI.getArticles();
+            List<MongoCovidNews.Articles> mongoCovidArticles = new ArrayList<>();
+
+            for (NewsAPI.Article article : articles) {
+                MongoCovidNews.Articles mongoArticle = new MongoCovidNews.Articles();
+                mongoArticle.setImgUrl(article.getUrlToImage());
+                mongoArticle.setPublishedAt(article.getPublishedDateEpoch());
+                mongoArticle.setTitle(article.getTitle());
+                mongoArticle.setUrl(article.getUrl());
+                mongoArticle.setSourceName(article.getSource().getName());
+                mongoCovidArticles.add(mongoArticle);
+            }
+            MongoCovidNews covidNews = new MongoCovidNews(csw.getState(), mongoCovidArticles);
+
+            newsAPIMongoRepository.save(covidNews);
+        }
     }
 }
