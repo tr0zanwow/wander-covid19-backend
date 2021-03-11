@@ -46,7 +46,7 @@ public class Covid19BackendController {
 
     @GetMapping("/getdata")
     public void getCovidData() throws Exception {
-        dataSyncService.getDataStateSeries();
+        dataSyncService.getNewsData();
     }
 
     @GetMapping("/synccoordinates")
@@ -56,7 +56,12 @@ public class Covid19BackendController {
 
     @GetMapping("/syncdata")
     public void syncData() throws Exception {
-        covidDataSyncConfiguration.syncLatestData();
+        covidDataSyncConfiguration.syncAllData();
+    }
+
+    @GetMapping("/syncnews")
+    public void syncNewsData() throws Exception {
+        dataSyncService.getNewsData();
     }
 
     @PostMapping("/signup")
