@@ -34,19 +34,9 @@ public class Covid19BackendController {
     @Autowired
     CovidDataSyncConfiguration covidDataSyncConfiguration;
 
-    @GetMapping("/")
-    public String home() {
-        return "Website Dashboard";
-    }
-
     @GetMapping("/verifyaccount")
     public ModelAndView verifyaccount(@RequestParam(value = "token", defaultValue = "", required = true) String token) {
         return userAuthService.verifyUserToken(token);
-    }
-
-    @GetMapping("/getdata")
-    public void getCovidData() throws Exception {
-        dataSyncService.getNewsData();
     }
 
     @GetMapping("/synccoordinates")
@@ -61,7 +51,7 @@ public class Covid19BackendController {
 
     @GetMapping("/syncnews")
     public void syncNewsData() throws Exception {
-        dataSyncService.getNewsData();
+        covidDataSyncConfiguration.syncNewsData();
     }
 
     @PostMapping("/signup")
