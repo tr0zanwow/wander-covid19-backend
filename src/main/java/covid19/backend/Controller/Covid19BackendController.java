@@ -2,6 +2,8 @@ package covid19.backend.Controller;
 
 import covid19.backend.Configuration.CovidDataSyncConfiguration;
 import covid19.backend.Models.*;
+import covid19.backend.Models.API.GlobalStatsAPIResponse;
+import covid19.backend.Repository.APIResponseRepository;
 import covid19.backend.Services.CovidDataSyncService;
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import covid19.backend.Utils.JWTUtil;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.ModelAndView;
+
 import javax.mail.MessagingException;
 import java.io.IOException;
 
@@ -27,6 +30,9 @@ public class Covid19BackendController {
 
     @Autowired
     CovidDataSyncService dataSyncService;
+
+    @Autowired
+    APIResponseRepository apiResponse;
 
     @Autowired
     JWTUtil jwtTokenUtil;
@@ -70,6 +76,16 @@ public class Covid19BackendController {
         } else {
             throw new ResponseStatusException(HttpStatus.SC_UNPROCESSABLE_ENTITY,
                     "Required Parameter Missing: One or more field is missing", null);
+        }
+    }
+
+    @GetMapping("/globalstats")
+    public GlobalStatsAPIResponse getGlobalStats() {
+        try {
+            return apiResponse.getGlobalStats();
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.SC_FORBIDDEN,
+                    e.getMessage(), null);
         }
     }
 }
