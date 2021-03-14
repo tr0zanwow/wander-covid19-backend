@@ -58,6 +58,9 @@ public class CovidDataSyncService {
     VideoNewsMongoRepository videoNewsMongoRepository;
 
     @Autowired
+    GlobalStatsMongoRepository globalStatsMongoRepository;
+
+    @Autowired
     GeoCoding geoCoding;
 
     @Autowired
@@ -67,6 +70,7 @@ public class CovidDataSyncService {
     private static final String STATE_SERIES_URL = "https://api.covid19india.org/csv/latest/state_wise_daily.csv";
     private static final String NATION_SERIES_URL = "https://api.covid19india.org/csv/latest/case_time_series.csv";
     private static final String DISTRICT_WISE_URL = "https://api.covid19india.org/csv/latest/district_wise.csv";
+    private static final String GLOBAL_STATS_URL = "https://api.covid19api.com/summary";
     private static final long MAX_SEARCH_RESULTS = 20;
 
     private BufferedReader getURLReader(String url) throws IOException {
@@ -271,5 +275,15 @@ public class CovidDataSyncService {
             }
 
         }
+    }
+
+    public void getGlobalStats(){
+        globalStatsMongoRepository.deleteAll();
+
+        GlobalStats globalStats = restTemplate.getForObject(GLOBAL_STATS_URL,GlobalStats.class);
+        GlobalStats.Global global = globalStats.getGlobal();
+        MongoGlobalStats mongoGlobalStats = new MongoGlobalStats(global.getNewConfirmed(), global.getTotalConfirmed(), global.getNewDeaths(), global.getTotalDeaths(), global.getNewRecovered(), global.getTotalRecovered(), global.getDateEpoch());
+
+        globalStatsMongoRepository.save(mongoGlobalStats);
     }
 }
