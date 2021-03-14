@@ -6,8 +6,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import covid19.backend.Services.UserAuthService;
-import io.jsonwebtoken.SignatureException;
-import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,13 +33,8 @@ public class JWTRequestFilter extends OncePerRequestFilter {
         String jwt = null;
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            try {
-                jwt = authHeader.substring(7);
-                username = jwtUtil.extractUsername(jwt);
-            } catch (SignatureException se) {
-                response.sendError(HttpStatus.SC_UNAUTHORIZED, "JWT signature does not match locally computed signature");
-            }
-
+            jwt = authHeader.substring(7);
+            username = jwtUtil.extractUsername(jwt);
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
