@@ -30,6 +30,7 @@ public class CovidDataSyncConfiguration {
         dataSyncService.getDataStateWise();
         dataSyncService.getDataNation();
         dataSyncService.getDataDistrictWise();
+        dataSyncService.getGlobalStats();
     }
 
     public void syncNewsData() throws ParseException {
