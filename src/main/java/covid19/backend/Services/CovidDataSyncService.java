@@ -18,7 +18,6 @@ import covid19.backend.Repository.GeoCoding;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -61,6 +60,9 @@ public class CovidDataSyncService {
     GlobalStatsMongoRepository globalStatsMongoRepository;
 
     @Autowired
+    StateSeriesLongMongoRepository seriesLongMongoRepository;
+
+    @Autowired
     GeoCoding geoCoding;
 
     @Autowired
@@ -68,6 +70,7 @@ public class CovidDataSyncService {
 
     private static final String STATE_WISE_URL = "https://api.covid19india.org/csv/latest/state_wise.csv";
     private static final String STATE_SERIES_URL = "https://api.covid19india.org/csv/latest/state_wise_daily.csv";
+    private static final String LONG_STATE_SERIES_URL = "https://api.covid19india.org/csv/latest/states.csv";
     private static final String NATION_SERIES_URL = "https://api.covid19india.org/csv/latest/case_time_series.csv";
     private static final String DISTRICT_WISE_URL = "https://api.covid19india.org/csv/latest/district_wise.csv";
     private static final String GLOBAL_STATS_URL = "https://api.covid19api.com/summary";
@@ -133,6 +136,24 @@ public class CovidDataSyncService {
             MongoCasesStateSeries casesStateSeries = new MongoCasesStateSeries(ss.getDateEpoch(), ss.getStatus(), ss.getTT(), ss.getAN(), ss.getAP(), ss.getAR(), ss.getAS(), ss.getBR(), ss.getCH(), ss.getCT(), ss.getDN(), ss.getDD(), ss.getDL(), ss.getGA(), ss.getGJ(), ss.getHR(), ss.getHP(), ss.getJK(), ss.getJH(), ss.getKA(), ss.getKL(), ss.getLA(), ss.getLD(), ss.getMP(), ss.getMH(), ss.getMN(), ss.getML(), ss.getMZ(), ss.getNL(), ss.getOR(), ss.getPY(), ss.getPB(), ss.getRJ(), ss.getSK(), ss.getTN(), ss.getTG(), ss.getTR(), ss.getUP(), ss.getUT(), ss.getWB(), ss.getUN());
             stateSeriesMongoRepository.save(casesStateSeries);
         }
+    }
+
+    public void getDataStateSeriesLong() throws Exception {
+        List<MongoCasesStateSeriesLong> seriesLongList = new ArrayList<>();
+
+        CsvToBean<CsvBeanStateSeriesLong> ssd = new CsvToBeanBuilder(getURLReader(LONG_STATE_SERIES_URL))
+                .withType(CsvBeanStateSeriesLong.class)
+                .withIgnoreLeadingWhiteSpace(true)
+                .build();
+
+        seriesLongMongoRepository.deleteAll();
+
+        for (CsvBeanStateSeriesLong ss : ssd) {
+            MongoCasesStateSeriesLong casesStateSeriesLong = new MongoCasesStateSeriesLong(ss.getDateEpoch(), ss.getState(), ss.getConfirmed(), ss.getRecovered(), ss.getDeceased());
+            seriesLongList.add(casesStateSeriesLong);
+        }
+
+        seriesLongMongoRepository.saveAll(seriesLongList);
     }
 
     public void getStateCoordinates() throws IOException {
@@ -277,10 +298,10 @@ public class CovidDataSyncService {
         }
     }
 
-    public void getGlobalStats(){
+    public void getGlobalStats() {
         globalStatsMongoRepository.deleteAll();
 
-        GlobalStats globalStats = restTemplate.getForObject(GLOBAL_STATS_URL,GlobalStats.class);
+        GlobalStats globalStats = restTemplate.getForObject(GLOBAL_STATS_URL, GlobalStats.class);
         GlobalStats.Global global = globalStats.getGlobal();
         MongoGlobalStats mongoGlobalStats = new MongoGlobalStats(global.getNewConfirmed(), global.getTotalConfirmed(), global.getNewDeaths(), global.getTotalDeaths(), global.getNewRecovered(), global.getTotalRecovered(), global.getDateEpoch());
 
