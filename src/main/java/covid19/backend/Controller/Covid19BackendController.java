@@ -2,7 +2,12 @@ package covid19.backend.Controller;
 
 import covid19.backend.Configuration.CovidDataSyncConfiguration;
 import covid19.backend.Models.*;
+import covid19.backend.Models.API.DistrictListAPIResponse;
 import covid19.backend.Models.API.GlobalStatsAPIResponse;
+import covid19.backend.Models.API.StateListAPIResponse;
+import covid19.backend.Models.MongoDB.MongoCasesDistrictWise;
+import covid19.backend.Models.MongoDB.MongoCasesStateWise;
+import covid19.backend.Models.MongoDB.MongoStateCoordinates;
 import covid19.backend.Repository.APIResponseRepository;
 import covid19.backend.Services.CovidDataSyncService;
 import org.apache.http.HttpStatus;
@@ -16,9 +21,9 @@ import covid19.backend.Utils.JWTUtil;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.ModelAndView;
-
 import javax.mail.MessagingException;
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 public class Covid19BackendController {
@@ -39,6 +44,10 @@ public class Covid19BackendController {
 
     @Autowired
     CovidDataSyncConfiguration covidDataSyncConfiguration;
+
+    @GetMapping("/test")
+    public void test() throws Exception {
+    }
 
     @GetMapping("/verifyaccount")
     public ModelAndView verifyaccount(@RequestParam(value = "token", defaultValue = "", required = true) String token) {
@@ -87,5 +96,19 @@ public class Covid19BackendController {
             throw new ResponseStatusException(HttpStatus.SC_FORBIDDEN,
                     e.getMessage(), null);
         }
+    }
+
+    @GetMapping("/statelist")
+    public List<StateListAPIResponse> getStateListAPIResponse() {
+        return apiResponse.getStateList();
+    }
+
+    @GetMapping("/districtlist")
+    public List<DistrictListAPIResponse> getDistrictList(@RequestParam(value = "state", defaultValue = "", required = true) String state){
+        return apiResponse.getDistrictList(state);
+    }
+
+    @GetMapping("/overviewdata")
+    public void overviewData(@RequestParam(value = "location", defaultValue = "", required = true) String location,@RequestParam(value = "type", defaultValue = "", required = true) String locationType){
     }
 }
