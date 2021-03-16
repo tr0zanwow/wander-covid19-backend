@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
-
 import java.io.IOException;
 import java.text.ParseException;
 
@@ -18,7 +17,8 @@ public class CovidDataSyncConfiguration {
 
     @Scheduled(cron = "0 0 21 * * *", zone = "GMT+5:30")
     public void syncLatestData() throws Exception {
-        dataSyncService.getNewsData();
+        this.syncAllData();
+        this.syncNewsData();
     }
 
     public void syncCoordinates() throws IOException {
