@@ -134,4 +134,8 @@ public class MongoCasesDistrictWise {
     public void setDeltaDeceased(Integer deltaDeceased) {
         this.deltaDeceased = deltaDeceased;
     }
+
+    public int getTotalActive(){
+        return this.confirmed - this.recovered - this.deceased;
+    }
 }
