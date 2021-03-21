@@ -5,4 +5,5 @@ import covid19.backend.Models.MongoDB.MongoCasesStateWise;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface StateSeriesMongoRepository extends MongoRepository<MongoCasesStateSeries,String> {
+    MongoCasesStateSeries findByState(String state);
 }
