@@ -15,6 +15,7 @@ import covid19.backend.Models.MongoDB.*;
 import covid19.backend.Models.NewsAPI;
 import covid19.backend.Repository.Covid19.*;
 import covid19.backend.Repository.GeoCoding;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -25,10 +26,7 @@ import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class CovidDataSyncService {
@@ -61,6 +59,12 @@ public class CovidDataSyncService {
 
     @Autowired
     StateSeriesLongMongoRepository seriesLongMongoRepository;
+
+    @Autowired
+    NationLatestMongoRepository latestMongoRepository;
+
+    @Autowired
+    StateCodeMappingMongoRepository codeMappingMongoRepository;
 
     @Autowired
     GeoCoding geoCoding;
@@ -132,10 +136,123 @@ public class CovidDataSyncService {
 
         stateSeriesMongoRepository.deleteAll();
 
+        HashMap<String, String> stateCodeMap = new HashMap<>();
+        stateCodeMap.put("maharashtra", "MH");
+        stateCodeMap.put("kerala", "KL");
+        stateCodeMap.put("karnataka", "KA");
+        stateCodeMap.put("andhraPradesh", "AP");
+        stateCodeMap.put("tamilNadu", "TN");
+        stateCodeMap.put("delhi", "DL");
+        stateCodeMap.put("uttarPradesh", "UP");
+        stateCodeMap.put("westBengal", "WB");
+        stateCodeMap.put("odisha", "OR");
+        stateCodeMap.put("rajasthan", "RJ");
+        stateCodeMap.put("chhattisgarh", "CT");
+        stateCodeMap.put("telangana", "TG");
+        stateCodeMap.put("haryana", "HR");
+        stateCodeMap.put("gujarat", "GJ");
+        stateCodeMap.put("bihar", "BR");
+        stateCodeMap.put("madhyaPradesh", "MP");
+        stateCodeMap.put("assam", "AS");
+        stateCodeMap.put("punjab", "PB");
+        stateCodeMap.put("jammuKashmir", "JK");
+        stateCodeMap.put("jharkhand", "JH");
+        stateCodeMap.put("uttarakhand", "UT");
+        stateCodeMap.put("himachalPradesh", "HP");
+        stateCodeMap.put("goa", "GA");
+        stateCodeMap.put("puducherry", "PY");
+        stateCodeMap.put("tripura", "TR");
+        stateCodeMap.put("manipur", "MN");
+        stateCodeMap.put("chandigarh", "CH");
+        stateCodeMap.put("arunachalPradesh", "AR");
+        stateCodeMap.put("meghalaya", "ML");
+        stateCodeMap.put("nagaland", "NL");
+        stateCodeMap.put("ladakh", "LA");
+        stateCodeMap.put("sikkim", "SK");
+        stateCodeMap.put("andamanNicobarIslands", "AN");
+        stateCodeMap.put("mizoram", "MZ");
+        stateCodeMap.put("damanDiu", "DN");
+        stateCodeMap.put("lakshadweep", "LD");
+
+        //State Instances
+        MongoCasesStateSeriesArray states = new MongoCasesStateSeriesArray();
+        MongoCasesStateSeries.DailySeries dailySeries;
+        List<MongoCasesStateSeries.DailySeries> dailySeriesList;
+
+        //Used java reflection to avoid getting some insult for using repeating code :p
         for (CsvBeanStateSeries ss : ssd) {
-            MongoCasesStateSeries casesStateSeries = new MongoCasesStateSeries(ss.getDateEpoch(), ss.getStatus(), ss.getTT(), ss.getAN(), ss.getAP(), ss.getAR(), ss.getAS(), ss.getBR(), ss.getCH(), ss.getCT(), ss.getDN(), ss.getDD(), ss.getDL(), ss.getGA(), ss.getGJ(), ss.getHR(), ss.getHP(), ss.getJK(), ss.getJH(), ss.getKA(), ss.getKL(), ss.getLA(), ss.getLD(), ss.getMP(), ss.getMH(), ss.getMN(), ss.getML(), ss.getMZ(), ss.getNL(), ss.getOR(), ss.getPY(), ss.getPB(), ss.getRJ(), ss.getSK(), ss.getTN(), ss.getTG(), ss.getTR(), ss.getUP(), ss.getUT(), ss.getWB(), ss.getUN());
-            stateSeriesMongoRepository.save(casesStateSeries);
+            if (states.getMaharashtra().getSeries().size() != 0) {
+                String lastItemDate = states.getMaharashtra().getSeries().get(states.getMaharashtra().getSeries().size() - 1).getDate();
+                if (lastItemDate.equals(ss.getDateEpoch())) {
+                    if ("Recovered".equals(ss.getStatus())) {
+                        for(String mapKey: stateCodeMap.keySet()){
+                            Object getStateProperty = PropertyUtils.getProperty(states, mapKey);
+                            List<MongoCasesStateSeries.DailySeries> getSeriesListProp = (List<MongoCasesStateSeries.DailySeries>) PropertyUtils.getProperty(getStateProperty, "series");
+                            Object lastElement = getSeriesListProp.get(getSeriesListProp.size() - 1);
+                            Object setValue = PropertyUtils.getProperty(ss, stateCodeMap.get(mapKey));
+                            PropertyUtils.setProperty(lastElement, "recovered", String.valueOf(setValue));
+                        }
+                    } else if ("Deceased".equals(ss.getStatus())) {
+                        for(String mapKey: stateCodeMap.keySet()){
+                            Object getStateProperty = PropertyUtils.getProperty(states, mapKey);
+                            List<MongoCasesStateSeries.DailySeries> getSeriesListProp = (List<MongoCasesStateSeries.DailySeries>) PropertyUtils.getProperty(getStateProperty, "series");
+                            Object lastElement = getSeriesListProp.get(getSeriesListProp.size() - 1);
+                            Object setValue = PropertyUtils.getProperty(ss, stateCodeMap.get(mapKey));
+                            PropertyUtils.setProperty(lastElement, "deceased", String.valueOf(setValue));
+                        }
+                    }
+                } else {
+                    for(String mapKey: stateCodeMap.keySet()){
+                        Object getStateProperty = PropertyUtils.getProperty(states, mapKey);
+                        List<MongoCasesStateSeries.DailySeries> getSeriesListProp = (List<MongoCasesStateSeries.DailySeries>) PropertyUtils.getProperty(getStateProperty, "series");
+                        Object setValue = PropertyUtils.getProperty(ss, stateCodeMap.get(mapKey));
+                        getSeriesListProp.add(getSeriesListProp.size(),new MongoCasesStateSeries.DailySeries(ss.getDateEpoch(), String.valueOf(setValue), "", ""));
+                    }
+                }
+            } else {
+                switch (ss.getStatus()) {
+                    case "Confirmed":
+                        for(String mapKey: stateCodeMap.keySet()){
+                            Object getStateProperty = PropertyUtils.getProperty(states, mapKey);
+                            Object setValue = PropertyUtils.getProperty(ss, stateCodeMap.get(mapKey));
+                            dailySeriesList = new ArrayList<>();
+                            dailySeriesList.add(new MongoCasesStateSeries.DailySeries(ss.getDateEpoch(), String.valueOf(setValue), "", ""));
+                            PropertyUtils.setProperty(getStateProperty,"series",dailySeriesList);
+                        }
+                        break;
+                    case "Recovered":
+                        for(String mapKey: stateCodeMap.keySet()){
+                            Object getStateProperty = PropertyUtils.getProperty(states, mapKey);
+                            Object setValue = PropertyUtils.getProperty(ss, stateCodeMap.get(mapKey));
+                            dailySeriesList = new ArrayList<>();
+                            dailySeriesList.add(new MongoCasesStateSeries.DailySeries(ss.getDateEpoch(), "", String.valueOf(setValue), ""));
+                            PropertyUtils.setProperty(getStateProperty,"series",dailySeriesList);
+                        }
+                        break;
+                    case "Deceased":
+                        for(String mapKey: stateCodeMap.keySet()){
+                            Object getStateProperty = PropertyUtils.getProperty(states, mapKey);
+                            Object setValue = PropertyUtils.getProperty(ss, stateCodeMap.get(mapKey));
+                            dailySeriesList = new ArrayList<>();
+                            dailySeriesList.add(new MongoCasesStateSeries.DailySeries(ss.getDateEpoch(), "", "", String.valueOf(setValue)));
+                            PropertyUtils.setProperty(getStateProperty,"series",dailySeriesList);
+                        }
+                        break;
+                }
+            }
         }
+
+        List<MongoCasesStateSeries> casesStateSeriesList = new ArrayList<>();
+        for(String mapKey: stateCodeMap.keySet()){
+            MongoCasesStateSeries casesStateSeries = (MongoCasesStateSeries) PropertyUtils.getProperty(states, mapKey);
+            List<MongoStateCodeMapping> stateCodeMapping = codeMappingMongoRepository.findAll();
+            MongoStateCodeMapping foundState = stateCodeMapping.stream().filter(mongoStateCodeMapping -> mongoStateCodeMapping.getCode().equals(stateCodeMap.get(mapKey))).findFirst().orElse(null);
+            if(foundState != null){
+                casesStateSeries.setState(foundState.getState());
+            }
+            casesStateSeriesList.add(casesStateSeries);
+        }
+        stateSeriesMongoRepository.saveAll(casesStateSeriesList);
     }
 
     public void getDataStateSeriesLong() throws Exception {
@@ -306,5 +423,38 @@ public class CovidDataSyncService {
         MongoGlobalStats mongoGlobalStats = new MongoGlobalStats(global.getNewConfirmed(), global.getTotalConfirmed(), global.getNewDeaths(), global.getTotalDeaths(), global.getNewRecovered(), global.getTotalRecovered(), global.getDateEpoch());
 
         globalStatsMongoRepository.save(mongoGlobalStats);
+    }
+
+    public void getNationLatestData() throws IOException {
+        latestMongoRepository.deleteAll();
+
+        CsvToBean<CsvBeanNationSeries> nsb = new CsvToBeanBuilder(getURLReader(NATION_SERIES_URL))
+                .withType(CsvBeanNationSeries.class)
+                .withIgnoreLeadingWhiteSpace(true)
+                .build();
+
+        List<CsvBeanNationSeries> nationSeriesList = nsb.parse();
+        CsvBeanNationSeries latestData = nationSeriesList.get(nationSeriesList.size() - 1);
+
+        MongoNationLatestData nationLatestData = new MongoNationLatestData(latestData.getDate2Epoch(), latestData.getdailyConfirmed(), latestData.getTotalConfirmed(), latestData.getDailyRecovered(), latestData.getTotalRecovered(), latestData.getDailyDeceased(), latestData.getTotalDeceased());
+
+        latestMongoRepository.save(nationLatestData);
+    }
+
+    public void stateCodeMapping() throws IOException {
+        codeMappingMongoRepository.deleteAll();
+
+        CsvToBean<CsvBeanStateWise> swb = new CsvToBeanBuilder(getURLReader(STATE_WISE_URL))
+                .withType(CsvBeanStateWise.class)
+                .withIgnoreLeadingWhiteSpace(true)
+                .build();
+        List<CsvBeanStateWise> stateWiseList = swb.parse();
+        List<MongoStateCodeMapping> stateCodeMappingList = new ArrayList<>();
+        for (CsvBeanStateWise sw : stateWiseList.subList(1, stateWiseList.size() - 1)) {
+            MongoStateCodeMapping stateCodeMapping = new MongoStateCodeMapping(sw.getState(), sw.getStateCode());
+            stateCodeMappingList.add(stateCodeMapping);
+        }
+
+        codeMappingMongoRepository.saveAll(stateCodeMappingList);
     }
 }
