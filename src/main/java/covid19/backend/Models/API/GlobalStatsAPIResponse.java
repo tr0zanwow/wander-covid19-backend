@@ -2,91 +2,155 @@ package covid19.backend.Models.API;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.ArrayList;
+
 public class GlobalStatsAPIResponse {
-    private Integer newConfirmed;
-    private Integer totalConfirmed;
-    private Integer newDeaths;
-    private Integer totalDeaths;
-    private Integer newRecovered;
-    private Integer totalRecovered;
-    private Integer totalActive;
-    private String date;
+    private Global global;
+    private National national;
 
     public GlobalStatsAPIResponse() {
     }
 
-    public GlobalStatsAPIResponse(Integer newConfirmed, Integer totalConfirmed, Integer newDeaths, Integer totalDeaths, Integer newRecovered, Integer totalRecovered, Integer totalActive, String date) {
-        this.newConfirmed = newConfirmed;
-        this.totalConfirmed = totalConfirmed;
-        this.newDeaths = newDeaths;
-        this.totalDeaths = totalDeaths;
-        this.newRecovered = newRecovered;
-        this.totalRecovered = totalRecovered;
-        this.totalActive = totalActive;
-        this.date = date;
+    public GlobalStatsAPIResponse(Global global, National national) {
+        this.global = global;
+        this.national = national;
     }
 
-    public Integer getTotalActive() {
-        return totalActive;
+    public Global getGlobal() {
+        return global;
     }
 
-    public void setTotalActive(Integer totalActive) {
-        this.totalActive = totalActive;
+    public void setGlobal(Global global) {
+        this.global = global;
     }
 
-    public Integer getNewConfirmed() {
-        return newConfirmed;
+    public National getNational() {
+        return national;
     }
 
-    public void setNewConfirmed(Integer newConfirmed) {
-        this.newConfirmed = newConfirmed;
+    public void setNational(National national) {
+        this.national = national;
     }
 
-    public Integer getTotalConfirmed() {
-        return totalConfirmed;
+    public static class Global {
+        private String date;
+        private String active;
+        private String confirmed;
+        private String recovered;
+        private String deceased;
+        private String deltaConfirmed;
+        private String deltaRecovered;
+        private String deltaDeceased;
+
+        public Global() {
+        }
+
+        public Global(String date, String active, String confirmed, String recovered, String deceased, String deltaConfirmed, String deltaRecovered, String deltaDeceased) {
+            this.date = date;
+            this.active = active;
+            this.confirmed = confirmed;
+            this.recovered = recovered;
+            this.deceased = deceased;
+            this.deltaConfirmed = deltaConfirmed;
+            this.deltaRecovered = deltaRecovered;
+            this.deltaDeceased = deltaDeceased;
+        }
+
+        public String getDate() {
+            return date;
+        }
+
+        public void setDate(String date) {
+            this.date = date;
+        }
+
+        public String getActive() {
+            return active;
+        }
+
+        public void setActive(String active) {
+            this.active = active;
+        }
+
+        public String getConfirmed() {
+            return confirmed;
+        }
+
+        public void setConfirmed(String confirmed) {
+            this.confirmed = confirmed;
+        }
+
+        public String getRecovered() {
+            return recovered;
+        }
+
+        public void setRecovered(String recovered) {
+            this.recovered = recovered;
+        }
+
+        public String getDeceased() {
+            return deceased;
+        }
+
+        public void setDeceased(String deceased) {
+            this.deceased = deceased;
+        }
+
+        public String getDeltaConfirmed() {
+            return deltaConfirmed;
+        }
+
+        public void setDeltaConfirmed(String deltaConfirmed) {
+            this.deltaConfirmed = deltaConfirmed;
+        }
+
+        public String getDeltaRecovered() {
+            return deltaRecovered;
+        }
+
+        public void setDeltaRecovered(String deltaRecovered) {
+            this.deltaRecovered = deltaRecovered;
+        }
+
+        public String getDeltaDeceased() {
+            return deltaDeceased;
+        }
+
+        public void setDeltaDeceased(String deltaDeceased) {
+            this.deltaDeceased = deltaDeceased;
+        }
     }
 
-    public void setTotalConfirmed(Integer totalConfirmed) {
-        this.totalConfirmed = totalConfirmed;
-    }
+    public static class National {
+        private String confirmed;
+        private ArrayList<Double> coordinates;
 
-    public Integer getNewDeaths() {
-        return newDeaths;
-    }
+        public National() {
+        }
 
-    public void setNewDeaths(Integer newDeaths) {
-        this.newDeaths = newDeaths;
-    }
+        public National(String confirmed) {
+            ArrayList<Double> coordinatesList = new ArrayList<>();
+            coordinatesList.add(70.86671478454372);
+            coordinatesList.add(23.184606689518663);
 
-    public Integer getTotalDeaths() {
-        return totalDeaths;
-    }
+            this.confirmed = confirmed;
+            this.coordinates = coordinatesList;
+        }
 
-    public void setTotalDeaths(Integer totalDeaths) {
-        this.totalDeaths = totalDeaths;
-    }
+        public String getConfirmed() {
+            return confirmed;
+        }
 
-    public Integer getNewRecovered() {
-        return newRecovered;
-    }
+        public void setConfirmed(String confirmed) {
+            this.confirmed = confirmed;
+        }
 
-    public void setNewRecovered(Integer newRecovered) {
-        this.newRecovered = newRecovered;
-    }
+        public ArrayList<Double> getCoordinates() {
+            return coordinates;
+        }
 
-    public Integer getTotalRecovered() {
-        return totalRecovered;
-    }
-
-    public void setTotalRecovered(Integer totalRecovered) {
-        this.totalRecovered = totalRecovered;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
+        public void setCoordinates(ArrayList<Double> coordinates) {
+            this.coordinates = coordinates;
+        }
     }
 }
