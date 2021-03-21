@@ -1,7 +1,6 @@
 package covid19.backend.Models.Covid19;
 
 import com.opencsv.bean.CsvBindByName;
-
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -479,16 +478,15 @@ public class CsvBeanStateSeries implements Serializable {
         this.uN = uN;
     }
 
-    public String getDateEpoch(){
+    public String getDateEpoch() {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss zz");
         Date date = null;
         try {
-            date = df.parse(this.dateYMD+" 06:00:00 GMT+05:30");
+            date = df.parse(this.dateYMD + " 06:00:00 GMT+05:30");
         } catch (ParseException e) {
             e.printStackTrace();
         }
         assert date != null;
         return String.valueOf(date.getTime());
     }
-
 }
