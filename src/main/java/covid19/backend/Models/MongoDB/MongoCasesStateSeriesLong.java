@@ -72,4 +72,9 @@ public class MongoCasesStateSeriesLong {
     public void setDeceased(String deceased) {
         this.deceased = deceased;
     }
+
+    public int getTotalActive(){
+        return Integer.parseInt(this.confirmed) - Integer.parseInt(this.recovered) - Integer.parseInt(this.deceased);
+    }
+
 }

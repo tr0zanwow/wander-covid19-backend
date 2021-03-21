@@ -124,4 +124,9 @@ public class MongoCasesStateWise {
     public void setDeltaDeaths(Integer deltaDeaths) {
         this.deltaDeaths = deltaDeaths;
     }
+
+    public int getTotalActive(){
+        return this.confirmed - this.recovered - this.deaths;
+    }
+
 }
