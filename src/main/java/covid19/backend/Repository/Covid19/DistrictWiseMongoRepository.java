@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface DistrictWiseMongoRepository extends MongoRepository<MongoCasesDistrictWise,String> {
     List<MongoCasesDistrictWise> findByState(String state);
+    MongoCasesDistrictWise findByDistrict(String district);
 }
