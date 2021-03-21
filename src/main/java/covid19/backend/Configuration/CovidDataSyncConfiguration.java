@@ -28,9 +28,11 @@ public class CovidDataSyncConfiguration {
 
     public void syncAllData() throws Exception {
         dataSyncService.getDataStateWise();
+        dataSyncService.getDataStateSeries();
         dataSyncService.getDataNation();
         dataSyncService.getDataDistrictWise();
         dataSyncService.getGlobalStats();
+        dataSyncService.getNationLatestData();
     }
 
     public void syncNewsData() throws ParseException {
