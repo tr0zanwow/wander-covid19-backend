@@ -81,4 +81,9 @@ public class MongoNationSeries {
     public void setTotalDeceased(Integer totalDeceased) {
         this.totalDeceased = totalDeceased;
     }
+
+    public int getTotalActive(){
+        return this.totalConfirmed - this.totalRecovered - this.totalDeceased;
+    }
+
 }
