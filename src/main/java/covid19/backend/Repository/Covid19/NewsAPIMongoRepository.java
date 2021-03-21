@@ -4,4 +4,5 @@ import covid19.backend.Models.MongoDB.MongoCovidNews;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface NewsAPIMongoRepository extends MongoRepository<MongoCovidNews,String> {
+    MongoCovidNews findByPlace(String place);
 }
