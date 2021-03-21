@@ -2,12 +2,7 @@ package covid19.backend.Controller;
 
 import covid19.backend.Configuration.CovidDataSyncConfiguration;
 import covid19.backend.Models.*;
-import covid19.backend.Models.API.DistrictListAPIResponse;
-import covid19.backend.Models.API.GlobalStatsAPIResponse;
-import covid19.backend.Models.API.StateListAPIResponse;
-import covid19.backend.Models.MongoDB.MongoCasesDistrictWise;
-import covid19.backend.Models.MongoDB.MongoCasesStateWise;
-import covid19.backend.Models.MongoDB.MongoStateCoordinates;
+import covid19.backend.Models.API.*;
 import covid19.backend.Repository.APIResponseRepository;
 import covid19.backend.Services.CovidDataSyncService;
 import org.apache.http.HttpStatus;
@@ -109,6 +104,7 @@ public class Covid19BackendController {
     }
 
     @GetMapping("/overviewdata")
-    public void overviewData(@RequestParam(value = "location", defaultValue = "", required = true) String location,@RequestParam(value = "type", defaultValue = "", required = true) String locationType){
+    public OverviewStatsAPIResponse overviewData(@RequestParam(value = "location", defaultValue = "", required = true) String location, @RequestParam(value = "type", defaultValue = "", required = true) String locationType){
+        return apiResponse.getOverviewData(location,locationType);
     }
 }
